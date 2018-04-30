@@ -43,8 +43,7 @@ var handler = (event, context, cb) => {
     var indexName = global.config.services_environment_index;
 
     try {
-
-
+        
         genericInputValidation(event)
             .then(function (result) {
                 // 1: GET environment by id and environent (/services/{service_id}/{environment})

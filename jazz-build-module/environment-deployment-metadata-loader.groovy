@@ -143,6 +143,44 @@ def createPromotedEnvironment(environment_logical_id, created_by) {
 }
 
 /**
+ * @param environment_logical_id
+ */
+def updateEnvironmentMetadata(environment_logical_id) {
+	def isAvailable = checkIfEnvironmentAvailable(environment_logical_id)
+	if (!isAvailable && service_config['domain'] != "jazz") { 
+		try {
+			def params = [
+				"service": service_config['service'],
+				"domain": service_config['domain'],
+				"status": "deployment_started",
+				"created_by": created_by,
+				"physical_id": g_service_branch,
+				"logical_id": environment_logical_id
+			]
+			def payload = JsonOutput.toJson(params)
+			def res = sh(script: "curl -X POST \
+						${g_base_url} \
+						-H 'authorization: $g_login_token' \
+						-H 'Content-type: application/json' \
+						-d '$payload'", returnStdout: true)
+			def resObj 
+			if (res) {
+				resObj = parseJson(res)
+			}
+			if (resObj && resObj.data && resObj.data.result && resObj.data.result == "success") {
+				g_environment_logical_id = environment_logical_id
+			} else {
+				error "Invalid response from environment API"
+			}
+		} catch (ex) {
+			error "Could not create environment for logical_id $environment_logical_id due to "+ ex.getMessage()
+		}
+	} else {
+		g_environment_logical_id = environment_logical_id
+	}
+}
+
+/**
  * Method to check an env is created with same logical id
  * @param environment = logical_id
  */

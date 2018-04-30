@@ -19,7 +19,6 @@ import groovy.transform.Field
 @Field def utilModule
 @Field def environmentDeploymentMetadata
 
-
 @Field def auth_token = ''
 @Field def g_svc_admin_cred_ID = 'SVC_ADMIN'
 @Field def g_base_url = ''
@@ -106,9 +105,7 @@ node() {
 	def internalAccess = config['require_internal_access']
 	def roleARN = configLoader.AWS.ROLEID.replaceAll("/", "\\\\/")
 
-	// @TODO: the below statement will be replaced with regular expression in very near future;
 	def roleId = roleARN.substring(roleARN.indexOf("::") + 2, roleARN.lastIndexOf(":"))
-
 
 	dir(repo_name)
 	{
@@ -125,7 +122,6 @@ node() {
 				}
 			}
 		}
-
 
 		events.sendStartedEvent('CREATE_DEPLOYMENT', 'Service deployment workflow started', environmentDeploymentMetadata.generateDeploymentMap("started", null), environment_logical_id)
 		def requestId = utilModule.generateRequestId()
